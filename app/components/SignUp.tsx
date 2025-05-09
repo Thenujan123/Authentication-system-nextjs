@@ -50,6 +50,8 @@ const SignUp = () => {
       user.username.length > 0
     ) {
       setSignupEnabled(true);
+    } else {
+      setSignupEnabled(false);
     }
   }, [user]);
   return (

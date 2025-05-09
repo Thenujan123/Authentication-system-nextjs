@@ -15,6 +15,7 @@ const eslintConfig = [
   {
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-non-null-asserted-optional-chain": "error", // Enforces safe optional chaining
     },
   },
 ];

@@ -3,6 +3,7 @@ import handleError from "../../helpers";
 import prisma from "@/lib/prisma";
 import SignupSchema from "@/schemas/Signup.sche";
 import { hash } from "argon2";
+
 export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();

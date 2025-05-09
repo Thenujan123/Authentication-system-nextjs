@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TextField, Button } from "@mui/material";
 
 import { useForm } from "react-hook-form";
@@ -7,11 +7,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import LoginSchema from "@/schemas/Login.schema";
 import { LoginSchemaType } from "@/schemas/type";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 const LoginPage = () => {
+  const router = useRouter();
+  const [loginEnable, setLoginEnable] = useState(false);
   const [user, setUser] = useState({
     email: "",
     password: "",
   });
+  type LoginUserType = {
+    email: string;
+    password: string;
+  };
 
   const {
     handleSubmit,
@@ -21,15 +31,35 @@ const LoginPage = () => {
     mode: "onTouched",
     resolver: zodResolver(LoginSchema),
   });
+  useEffect(() => {
+    if (user.email.length > 0 && user.password.length > 0) {
+      setLoginEnable(true);
+    } else {
+      setLoginEnable(false);
+    }
+  }, [user]);
+  const LoginUSer = async (Formdata: LoginUserType) => {
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL!}/user/login`,
+      Formdata
+    );
+    router.push("/profile");
+    toast.success("User Login Successfully");
+  };
+  const { mutateAsync: login, isPending } = useMutation({
+    mutationFn: LoginUSer,
+  });
   return (
     <div className="h-dvh w-screen flex justify-center items-center">
       <form
         className=" flex flex-col gap-5 p-10 w-[60%] h-fit border-1 border-gray-600 rounded mx-auto"
-        onSubmit={handleSubmit((Formdata) => {
-          console.log(Formdata);
+        onSubmit={handleSubmit(async (Formdata) => {
+          await login(Formdata);
         })}
       >
-        <h1 className="text-center font-bold capitalize">Sign Up</h1>
+        <h1 className="text-center font-bold capitalize">
+          {isPending ? "PRocessing" : "Login"}
+        </h1>
         <div className="w-full">
           <TextField
             label="email"
@@ -63,7 +93,7 @@ const LoginPage = () => {
 
         <div className="w-full">
           <Button variant="contained" type="submit" fullWidth>
-            Signup
+            {loginEnable ? "Login" : "no Login"}
           </Button>
         </div>
         <div className="w-full flex justify-center">
